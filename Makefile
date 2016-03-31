@@ -14,4 +14,4 @@ test.c: test.l
 	flex -t test.l >test.c
 
 clean:
-	@rm test.c test
+	@rm test.c test ext.tab.*
