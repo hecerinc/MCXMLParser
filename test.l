@@ -1,14 +1,16 @@
 %{
 	//#include "<string.h>"
+//	extern "C" int yylex();
+	#include "ext.h"
 	#include "ext.tab.h"
-	#include <stdio.h>
-	#define true 1
-	#define false 0
+	//#define true 1
+	//#define false 0
 	//enum{STATE=1,INIT, FINAL, IDENTIFIER};
+	/*
 	struct tell{
 		int id, isInitial, isFinal;
 		char * name;
-	};
+	};*/
 	//struct tell yylval;
 	//extern yylval;
 %}
@@ -22,19 +24,20 @@ NUMBER {DIGIT}+
 
 "<state" 								BEGIN STATE;
 &#13;									;
-<STATE>{NUMBER}							{yylval.id = atoi(yytext); return IDENTIFIER;} /* rule for state id */
-<STATE>{ALPHA}+							{yylval.name = yytext; return IDENTIFIER2;} /* rule for state name */
-<STATE>"<intial/>"						{yylval.isInitial = true; return INIT;}
-<STATE>"<final/>"						{yylval.isFinal = true; return FINAL;}
-<STATE>"</state>"						BEGIN INITIAL;
-"<transition>"							BEGIN TRANSITION;
-<TRANSITION>"<from>"|"<to>"|"<read>"	{return yytext;}
-<TRANSITION>{NUMBER}					{yylval.id = atoi(yytext); return IDENTIFIER3;} /* rule for state id */
-<TRANSITION>{ALPHA}+					{yylval.name = yytext; return IDENTIFIER4;} /* rule for transition read */
+<STATE>{NUMBER}						{yylval.number = atoi(yytext); return NUM;} /* rule for state id */
+<STATE>{ALPHA}+						{yylval.string = yytext; return ALPHA;} /* rule for state name */
+<STATE>"<intial/>"					{yylval.boolean = true; return INIT;}
+<STATE>"<final/>"					{yylval.boolean = true; return FINAL;}
+<STATE>"</state>"					BEGIN INITIAL;
+"<transition>"						BEGIN TRANSITION;
+<TRANSITION>"<from>"|"<to>"|"<read>"			{yylval.string = yytext; return ftr;}
+<TRANSITION>{NUMBER}					{yylval.number = atoi(yytext); return NUM;} /* rule for state id */
+<TRANSITION>{ALPHA}+					{yylval.string = yytext; return ALPHA;} /* rule for transition read */
 
 "</transition>"				BEGIN INITIAL;
-[=\"]						{return yytext[0];}
-id|name						{printf("%s", yytext); /*return yytext;*/}
-.							{printf("%s", yytext);}
+[=\"]					{return yytext[0];}
+"id"					{return ID;}
+"name"					{return NAME;}
+.					{printf("%s", yytext);}
 
 %%
